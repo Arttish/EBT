@@ -366,6 +366,8 @@ if __name__ == '__main__':
     parser.add_argument("--no_langevin_during_eval", help="dont use langevin dynamics during validation", action="store_true", default = False)
     
     parser.add_argument("--mcmc_step_size", help="is size of optimization step, or alpha in the paper, kinda like LR, can be learned param", type=float, default=60.0)
+
+    parser.add_argument("--beta", help="beta for momentum in MCMC", type=float, default=0.9)
     
     parser.add_argument("--mcmc_step_size_learnable", help="makes mcmc_step_size a learnable param", action="store_true", default = False)
     
