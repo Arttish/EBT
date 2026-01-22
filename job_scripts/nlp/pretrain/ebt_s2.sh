@@ -36,11 +36,11 @@ python train_model.py \
 --ebt_type "time_embed" \
 --denoising_initial_condition "random_noise" \
 --mcmc_step_size ${alpha[${SLURM_ARRAY_TASK_ID}]} \
---beta 0.9 \
 --randomize_mcmc_step_size_scale ${alpha_random_scale[$SLURM_ARRAY_TASK_ID]} \
 --randomize_mcmc_num_steps ${randomize_mcmc_num_steps[${SLURM_ARRAY_TASK_ID}]} \
 --randomize_mcmc_num_steps_min 2 \
---infer_beta 0.9 \
+--infer_beta1 0.9 \
+--infer_beta2 0.999 \
 --mcmc_num_steps 1 \
 \
 --context_length 256 \
