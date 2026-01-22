@@ -130,11 +130,11 @@ class EBT_NLP(L.LightningModule):
                         predicted_tokens = self.softmax(predicted_tokens)
                         
                     if self.hparams.vocab_to_embed_uses_prob_dist: # predicted_embeds is B, S, V; embed is V, D
-                        predicted_embeddings = torch.matmul(predicted_tokens, self.embeddings.weight) #BS, S, D
+                        predicted_embeddings = torch.matmul(predicted_tokens - self.hparams.beta * v, self.embeddings.weight) #BS, S, D
                     else:
-                        predicted_embeddings = self.vocab_to_embed(predicted_tokens) #BS, S, D
+                        predicted_embeddings = self.vocab_to_embed(predicted_tokens - self.hparams.beta * v) #BS, S, D
                 else:
-                    predicted_embeddings = self.vocab_to_embed(predicted_tokens) #BS, S, D
+                    predicted_embeddings = self.vocab_to_embed(predicted_tokens - self.hparams.beta * v) #BS, S, D
                 
                 all_embeddings = torch.cat((real_embeddings_input, predicted_embeddings), dim = 1) # B, 2*S, D
                 
