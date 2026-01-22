@@ -462,11 +462,11 @@ class EBT_NLP(L.LightningModule):
                         cur_pred_tokens = self.softmax(cur_pred_tokens)
                             
                     if self.hparams.vocab_to_embed_uses_prob_dist: # predicted_embeds is B, S, V; embed is V, D
-                        pred_embeds = torch.matmul(cur_pred_tokens, self.embeddings.weight) #BS, S, D
+                        pred_embeds = torch.matmul(cur_pred_tokens - beta * v, self.embeddings.weight) #BS, S, D
                     else:
-                        pred_embeds = self.vocab_to_embed(cur_pred_tokens) #BS, S, D
+                        pred_embeds = self.vocab_to_embed(cur_pred_tokens - beta * v) #BS, S, D
                 else:
-                    pred_embeds = self.vocab_to_embed(cur_pred_tokens)
+                    pred_embeds = self.vocab_to_embed(cur_pred_tokens - beta * v)
 
                 combined_embeddings = torch.cat([real_embeds, pred_embeds], dim=1)  # (chunk_size, 2S, D)
                 energies = self.transformer(combined_embeddings, start_pos=start_pos, mcmc_step=step_idx)
