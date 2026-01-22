@@ -440,7 +440,7 @@ class EBT_NLP(L.LightningModule):
         energies_list = []
         pred_states_list = []
         pred_states_list.append(initial_pred_tokens)
-        v = 0
+        v = torch.zeros_like(initial_pred_tokens)
 
         def do_mcmc_step(step_idx, cur_pred_tokens, alpha, beta, v):
             with torch.set_grad_enabled(True):
