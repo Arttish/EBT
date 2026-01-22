@@ -438,8 +438,10 @@ class EBT_NLP(L.LightningModule):
         energies_list = []
         pred_states_list = []
         pred_states_list.append(initial_pred_tokens)
+        G = torch.zeros_like(initial_pred_tokens)
+        eps = 1e-8
 
-        def do_mcmc_step(step_idx, cur_pred_tokens, alpha):
+        def do_mcmc_step(step_idx, cur_pred_tokens, alpha, G, eps):
             with torch.set_grad_enabled(True):
                 cur_pred_tokens = cur_pred_tokens.detach().requires_grad_()
 
@@ -475,17 +477,18 @@ class EBT_NLP(L.LightningModule):
                 if self.hparams.clamp_futures_grad:
                     min_and_max = self.hparams.clamp_futures_grad_max_change / (alpha)
                     grad = torch.clamp(grad, -min_and_max, min_and_max)
-
+                
+                G += grad ** 2
                 if self.hparams.infer_accept_lower_energies: # have to get energy to determine if should decrease
                     old_energies = energies.reshape(cur_pred_tokens.shape[:2])
-                    proposed_tokens = cur_pred_tokens - alpha * grad
+                    proposed_tokens = cur_pred_tokens - alpha * grad / (torch.sqrt(G) + eps)
                     new_energies = get_energy(step_idx, proposed_tokens).reshape(cur_pred_tokens.shape[:2])
                     accept_mask = (new_energies < old_energies).float().unsqueeze(-1)
                     updated_tokens = accept_mask * proposed_tokens + (1 - accept_mask) * cur_pred_tokens
 
                 else:
-                    updated_tokens = cur_pred_tokens - alpha * grad
-                return updated_tokens.detach()
+                    updated_tokens = cur_pred_tokens - alpha * grad / (torch.sqrt(G) + eps)
+                return updated_tokens.detach(), G
             
         def get_energy(step_idx, cur_pred_tokens): # for if just want to get energy of currently predicted tokens
             with torch.no_grad():
@@ -515,7 +518,7 @@ class EBT_NLP(L.LightningModule):
             total_steps = self.hparams.infer_ebt_num_steps if self.hparams.infer_ebt_num_steps > 1 else self.hparams.mcmc_num_steps
             pred_state = initial_pred_tokens
             for step_idx in range(total_steps):
-                pred_state = do_mcmc_step(step_idx, pred_state, adjusted_alpha)
+                pred_state, G = do_mcmc_step(step_idx, pred_state, adjusted_alpha, G, eps)
                 pred_states_list.append(pred_state)
         else:
             # alternative ebt_type i.e. adaln or time embed
@@ -523,13 +526,13 @@ class EBT_NLP(L.LightningModule):
             for step_idx in range(self.hparams.mcmc_num_steps):
                 if self.hparams.infer_steps_final_landscape and step_idx != (self.hparams.mcmc_num_steps - 1):
                     alpha = self.alpha if self.hparams.infer_alpha_final_landscape else adjusted_alpha
-                    pred_state = do_mcmc_step(step_idx, pred_state, alpha)
+                    pred_state, G = do_mcmc_step(step_idx, pred_state, alpha, G, eps)
                     pred_states_list.append(pred_state)
                 else:
                     inner_steps = self.hparams.infer_ebt_num_steps if self.hparams.infer_ebt_num_steps != 1 else (self.hparams.randomize_mcmc_num_steps_min if self.hparams.randomize_mcmc_num_steps_min != 0 else 1)
                     for _ in range(inner_steps):
                         alpha = self.alpha if (self.hparams.infer_alpha_final_landscape and step_idx != (self.hparams.mcmc_num_steps - 1)) else adjusted_alpha
-                        pred_state = do_mcmc_step(step_idx, pred_state, alpha)
+                        pred_state, G = do_mcmc_step(step_idx, pred_state, alpha, G, eps)
                         pred_states_list.append(pred_state)
 
 
