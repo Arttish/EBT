@@ -70,6 +70,9 @@ class EBT_NLP(L.LightningModule):
         real_embeddings_input = self.embeddings(x)
         batch_size = x.shape[0]
         seq_length = x.shape[1]
+
+        G = torch.zeros_like(batch_size, seq_length, self.vocab_size)
+        beta = self.hparams.infer_beta
         
         alpha = torch.clamp(self.alpha, min=0.0001)
         if not no_randomness and self.hparams.randomize_mcmc_step_size_scale != 1:
@@ -158,7 +161,8 @@ class EBT_NLP(L.LightningModule):
                 if torch.isnan(predicted_tokens_grad).any() or torch.isinf(predicted_tokens_grad).any():
                     raise ValueError("NaN or Inf gradients detected during MCMC.")
                 
-                predicted_tokens = predicted_tokens - alpha * predicted_tokens_grad # do this to tokens will be unnormalize prob dist convert to prob dist after  
+                G = beta * G + (1 - beta) * (predicted_tokens_grad ** 2) 
+                predicted_tokens = predicted_tokens - alpha * predicted_tokens_grad / (torch.sqrt(G + 1e-8)) # do this to tokens will be unnormalize prob dist convert to prob dist after  
                 
                 if self.hparams.absolute_clamp != 0.0:
                     predicted_tokens = torch.clamp(predicted_tokens, min = -self.hparams.absolute_clamp, max = self.hparams.absolute_clamp)
