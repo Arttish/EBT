@@ -39,7 +39,7 @@ class RedPajamaDataset(Dataset):
                 print("done formatting dataset")
                 self.dataset.save_to_disk(save_path)
         else:
-            self.dataset = load_dataset("togethercomputer/RedPajama-Data-V2", "sample-100B", split = "train", cache_dir=dataset_dir, trust_remote_code=True, keep_in_memory = False)
+            self.dataset = load_dataset("togethercomputer/RedPajama-Data-V2", "sample", split = "train", cache_dir=dataset_dir, trust_remote_code=True, keep_in_memory = False)
 
         self.hparams = hparams
 
