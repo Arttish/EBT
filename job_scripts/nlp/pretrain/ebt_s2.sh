@@ -48,9 +48,9 @@ python train_model.py \
 \
 --peak_learning_rate ${lr[${SLURM_ARRAY_TASK_ID}]} \
 --float_precision "bf16-mixed" \
---batch_size_per_device 48 \
---prefetch_factor 4 \
---accumulate_grad_batches 2 \
+--batch_size_per_device 32 \
+--prefetch_factor 8 \
+--accumulate_grad_batches 4 \
 --gradient_clip_val 1.0 \
 \
 --weight_decay 0.01 \
@@ -62,7 +62,7 @@ python train_model.py \
 --dataset_name "pajama" \
 --num_workers 12 \
 --validation_split_pct 0.0005 \
---val_check_interval 4000 \
+--val_check_interval 1.0 \
 \
 --wandb_project 'nlp_pretrain' \
 \
