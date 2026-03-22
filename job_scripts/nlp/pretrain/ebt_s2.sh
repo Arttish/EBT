@@ -46,7 +46,9 @@ python train_model.py \
 --gpus "-1" \
 \
 --peak_learning_rate ${lr[${SLURM_ARRAY_TASK_ID}]} \
---batch_size_per_device 16 \
+--float_precision "bf16-mixed" \
+--batch_size_per_device 128 \
+--prefetch_factor 4 \
 --accumulate_grad_batches 2 \
 --gradient_clip_val 1.0 \
 \
@@ -57,7 +59,7 @@ python train_model.py \
 --warm_up_steps 10000 \
 \
 --dataset_name "pajama" \
---num_workers 12 \
+--num_workers 16 \
 --validation_split_pct 0.0005 \
 --val_check_interval 15000 \
 \
@@ -69,4 +71,5 @@ python train_model.py \
 --set_matmul_precision "medium" \
 --wandb_watch \
 --no_wandb \
+--compile_model \
 ${SLURM_ARRAY_TASK_ID:+--is_slurm_run}
