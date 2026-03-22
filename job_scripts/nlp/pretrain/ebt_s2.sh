@@ -61,7 +61,7 @@ python train_model.py \
 --dataset_name "pajama" \
 --num_workers 16 \
 --validation_split_pct 0.0005 \
---val_check_interval 15000 \
+--val_check_interval 4000 \
 \
 --wandb_project 'nlp_pretrain' \
 \
