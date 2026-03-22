@@ -48,7 +48,7 @@ python train_model.py \
 \
 --peak_learning_rate ${lr[${SLURM_ARRAY_TASK_ID}]} \
 --float_precision "bf16-mixed" \
---batch_size_per_device 64 \
+--batch_size_per_device 48 \
 --prefetch_factor 4 \
 --accumulate_grad_batches 2 \
 --gradient_clip_val 1.0 \
