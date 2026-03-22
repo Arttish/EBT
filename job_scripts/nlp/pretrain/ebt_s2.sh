@@ -30,6 +30,7 @@ python train_model.py \
 \
 --no_mcmc_detach \
 --mcmc_replay_buffer \
+--mcmc_replay_buffer_size 96 \
 --truncate_mcmc \
 --langevin_dynamics_noise 3.0 \
 --normalize_initial_condition \
