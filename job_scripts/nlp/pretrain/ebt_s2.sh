@@ -30,6 +30,7 @@ python train_model.py \
 \
 --no_mcmc_detach \
 --mcmc_replay_buffer \
+--mcmc_replay_buffer_size 16 \
 --truncate_mcmc \
 --langevin_dynamics_noise 3.0 \
 --normalize_initial_condition \
@@ -42,25 +43,28 @@ python train_model.py \
 --randomize_mcmc_num_steps_min 2 \
 --mcmc_num_steps 1 \
 \
---context_length 256 \
+--context_length 128 \
 \
 --gpus "-1" \
 \
 --peak_learning_rate ${lr[${SLURM_ARRAY_TASK_ID}]} \
---batch_size_per_device 32 \
---accumulate_grad_batches 2 \
+--float_precision "bf16-mixed" \
+--batch_size_per_device 96 \
+--prefetch_factor 8 \
+--accumulate_grad_batches 4 \
 --gradient_clip_val 1.0 \
 \
 --weight_decay 0.01 \
 --min_lr_scale 10 \
 --max_steps 1000000 \
+--max_epochs 3 \
 --max_scheduling_steps 1000000 \
 --warm_up_steps 10000 \
 \
 --dataset_name "pajama" \
 --num_workers 12 \
 --validation_split_pct 0.0005 \
---val_check_interval 15000 \
+--val_check_interval 1.0 \
 \
 --no_wandb \
 --wandb_project 'nlp_pretrain' \
@@ -70,6 +74,6 @@ python train_model.py \
 \
 --set_matmul_precision "medium" \
 --wandb_watch \
-\
---float_precision "16-true" \
+--no_wandb \
+--compile_model \
 ${SLURM_ARRAY_TASK_ID:+--is_slurm_run}

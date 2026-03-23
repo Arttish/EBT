@@ -29,7 +29,7 @@ class RedPajamaDataset(Dataset):
                 self.dataset = load_from_disk(save_path)
             else: # need to create dataset
                 print(f"no pre-tokenized {hparams.dataset_name} dataset with correct settings, loading and saving")
-                self.dataset = load_dataset("togethercomputer/RedPajama-Data-V2", "sample", split = "train", cache_dir=dataset_dir, trust_remote_code=True, keep_in_memory = False)
+                self.dataset = load_dataset("togethercomputer/RedPajama-Data-V2", "sample", split = "train", cache_dir=dataset_dir, trust_remote_code=True, keep_in_memory = False,  languages=["en"])
 
                 num_proc = hparams.num_workers * hparams.num_gpus
                 print("num_proc using for dataset map", num_proc) # found that if have 192 cpus then cannot use 96 (it freezes), so 48 was good. make sure to test this with your own hardware and adjust num workers accordingly
@@ -40,7 +40,7 @@ class RedPajamaDataset(Dataset):
                 print("done formatting dataset")
                 self.dataset.save_to_disk(save_path)
         else:
-            self.dataset = load_dataset("togethercomputer/RedPajama-Data-V2", "sample", split = "train", cache_dir=dataset_dir, trust_remote_code=True, keep_in_memory = False)
+            self.dataset = load_dataset("togethercomputer/RedPajama-Data-V2", "sample", split = "train", cache_dir=dataset_dir, trust_remote_code=True, keep_in_memory = False, languages=["en"])
 
         self.hparams = hparams
 
