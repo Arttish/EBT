@@ -265,6 +265,7 @@ def set_trainer(args, wandb_logger, checkpoint_callback, stage = "train"):
         num_nodes=args.num_nodes,
         precision=args.float_precision,
         max_steps=args.max_steps,
+        max_epochs=args.max_epochs,
         logger=wandb_logger,
         enable_model_summary=args.log_model_archi,
         callbacks = [checkpoint_callback, ModelSummary(max_depth=-1)],
@@ -547,6 +548,8 @@ if __name__ == '__main__':
     parser.add_argument("--min_lr_scale", help="the most the lr will be scaled down during cosine decay", type=int, default=10)
 
     parser.add_argument("--max_steps", help="max number of steps for training", type=int, default=1000000)
+
+    parser.add_argument("--max_epochs", help="max number of epochs for training", type=int, default=None)
 
     parser.add_argument("--max_scheduling_steps", help="max number of steps used for lr/other hparam scheduling. in general should be the same as max_steps but can be different if dont want to do a full run but want the lr and other things to be scheduled the same. similar to V jepa paper. if is not set will default to max_steps value", type=int, default=-1)
         
