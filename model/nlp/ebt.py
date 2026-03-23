@@ -160,6 +160,7 @@ class EBT_NLP(L.LightningModule):
                     raise ValueError("NaN or Inf gradients detected during MCMC.")
                 
                 v = self.hparams.beta * v + (1 - self.hparams.beta) * predicted_tokens_grad
+                print(v)
                 predicted_tokens = predicted_tokens - alpha * v # do this to tokens will be unnormalize prob dist convert to prob dist after  
                 
                 if self.hparams.absolute_clamp != 0.0:
