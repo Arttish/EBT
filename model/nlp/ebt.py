@@ -87,6 +87,7 @@ class EBT_NLP(L.LightningModule):
             predicted_tokens[batch_size - replay_buffer_logits.shape[0]:] = replay_buffer_logits # NOTE this assumes the fresh data is concatted first
 
         v = 0        
+        eps = 1e-8
         
         mcmc_steps = [] # in the general case of no randomize_mcmc_num_steps then this has len == self.hparams.randomize_mcmc_num_steps
         for step in range(self.hparams.mcmc_num_steps):
@@ -159,7 +160,7 @@ class EBT_NLP(L.LightningModule):
                 if torch.isnan(predicted_tokens_grad).any() or torch.isinf(predicted_tokens_grad).any():
                     raise ValueError("NaN or Inf gradients detected during MCMC.")
                 
-                v = self.hparams.beta * v + (1 - self.hparams.beta) * predicted_tokens_grad
+                v = self.hparams.beta * v + (1 - self.hparams.beta) * predicted_tokens_grad + eps
                 predicted_tokens = predicted_tokens - alpha * v # do this to tokens will be unnormalize prob dist convert to prob dist after  
                 
                 if self.hparams.absolute_clamp != 0.0:
