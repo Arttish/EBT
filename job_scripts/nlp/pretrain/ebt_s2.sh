@@ -28,6 +28,7 @@ python train_model.py \
 --pretokenize_dataset \
 --tokenizer "EleutherAI/gpt-neox-20b" \
 \
+--absolute_clamp 1e8 \
 --no_mcmc_detach \
 --mcmc_replay_buffer \
 --mcmc_replay_buffer_size 16 \
