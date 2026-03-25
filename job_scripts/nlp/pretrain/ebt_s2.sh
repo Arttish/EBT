@@ -32,7 +32,6 @@ python train_model.py \
 --mcmc_replay_buffer \
 --mcmc_replay_buffer_size 16 \
 --truncate_mcmc \
---clamp_futures_grad \
 --langevin_dynamics_noise 3.0 \
 --normalize_initial_condition \
 --ebt_type "time_embed" \

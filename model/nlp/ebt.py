@@ -156,8 +156,13 @@ class EBT_NLP(L.LightningModule):
                     # predicted_tokens_grad = scale_clamp(predicted_tokens_grad, -min_and_max, min_and_max)
                     predicted_tokens_grad = torch.clamp(predicted_tokens_grad, min = -min_and_max, max = min_and_max)
                     
-                if torch.isnan(predicted_tokens_grad).any() or torch.isinf(predicted_tokens_grad).any():
-                    raise ValueError("NaN or Inf gradients detected during MCMC.")
+                if torch.isnan(predicted_tokens_grad).any():
+                    print("predicted_tokens_grad", predicted_tokens_grad, '\nv', v)
+                    raise ValueError("NaN gradients detected during MCMC.")
+                
+                if torch.isinf(predicted_tokens_grad).any():
+                    print("predicted_tokens_grad", predicted_tokens_grad, '\nv', v)
+                    raise ValueError("Inf gradients detected during MCMC.")
                 
                 v = self.hparams.beta * v + (1 - self.hparams.beta) * predicted_tokens_grad + eps
                 predicted_tokens = predicted_tokens - alpha * v # do this to tokens will be unnormalize prob dist convert to prob dist after  
