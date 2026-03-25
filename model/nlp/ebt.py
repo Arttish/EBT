@@ -131,11 +131,11 @@ class EBT_NLP(L.LightningModule):
                         predicted_tokens = self.softmax(predicted_tokens)
                         
                     if self.hparams.vocab_to_embed_uses_prob_dist: # predicted_embeds is B, S, V; embed is V, D
-                        predicted_embeddings = torch.matmul(predicted_tokens - self.hparams.beta * v + eps, self.embeddings.weight) #BS, S, D
+                        predicted_embeddings = torch.matmul(predicted_tokens - self.hparams.beta * v, self.embeddings.weight) #BS, S, D
                     else:
-                        predicted_embeddings = self.vocab_to_embed(predicted_tokens - self.hparams.beta * v + eps) #BS, S, D
+                        predicted_embeddings = self.vocab_to_embed(predicted_tokens - self.hparams.beta * v) #BS, S, D
                 else:
-                    predicted_embeddings = self.vocab_to_embed(predicted_tokens - self.hparams.beta * v + eps) #BS, S, D
+                    predicted_embeddings = self.vocab_to_embed(predicted_tokens - self.hparams.beta * v) #BS, S, D
                 
                 all_embeddings = torch.cat((real_embeddings_input, predicted_embeddings), dim = 1) # B, 2*S, D
                 
@@ -157,16 +157,14 @@ class EBT_NLP(L.LightningModule):
                     predicted_tokens_grad = torch.clamp(predicted_tokens_grad, min = -min_and_max, max = min_and_max)
                     
                 if torch.isnan(predicted_tokens_grad).any():
-                    print("predicted_tokens_grad", predicted_tokens_grad, '\nv', v)
+                    print('v', v)
                     raise ValueError("NaN gradients detected during MCMC.")
                 
                 if torch.isinf(predicted_tokens_grad).any():
-                    print("predicted_tokens_grad", predicted_tokens_grad, '\nv', v)
+                    print('v', v)
                     raise ValueError("Inf gradients detected during MCMC.")
                 
                 v = self.hparams.beta * v + (1 - self.hparams.beta) * predicted_tokens_grad + eps
-                if v == 0:
-                    v += eps
                 predicted_tokens = predicted_tokens - alpha * v # do this to tokens will be unnormalize prob dist convert to prob dist after  
                 
                 if self.hparams.absolute_clamp != 0.0:
