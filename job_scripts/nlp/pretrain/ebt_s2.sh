@@ -41,6 +41,7 @@ python train_model.py \
 --randomize_mcmc_num_steps ${randomize_mcmc_num_steps[${SLURM_ARRAY_TASK_ID}]} \
 --randomize_mcmc_num_steps_min 2 \
 --mcmc_num_steps 1 \
+--absolute_clamp 1e9
 \
 --context_length 128 \
 \
