@@ -164,7 +164,9 @@ class EBT_NLP(L.LightningModule):
                 if torch.isinf(predicted_tokens_grad).any():
                     raise ValueError("Inf gradients detected during MCMC.")
                 
-                G += predicted_tokens_grad ** 2 + eps
+                G += predicted_tokens_grad ** 2
+                G = torch.clamp(G, min=-1e12, max=1e12)
+
                 predicted_tokens = predicted_tokens - alpha * predicted_tokens_grad / (torch.sqrt(G + eps)) + eps # do this to tokens will be unnormalize prob dist convert to prob dist after  
                 
                 if self.hparams.absolute_clamp != 0.0:
