@@ -158,16 +158,18 @@ class EBT_NLP(L.LightningModule):
                     # predicted_tokens_grad = scale_clamp(predicted_tokens_grad, -min_and_max, min_and_max)
                     predicted_tokens_grad = torch.clamp(predicted_tokens_grad, min = -min_and_max, max = min_and_max)
                     
-                if torch.isnan(predicted_tokens_grad).any() :
+                if torch.isnan(predicted_tokens_grad).any():
                     raise ValueError("NaN gradients detected during MCMC.")
                 
                 if torch.isinf(predicted_tokens_grad).any():
+                    print(f"grad: min {predicted_tokens_grad.min()}, max {predicted_tokens_grad.max()}")
+                    print(f"G: min {G.min()}, max {G.max()}, inf: {torch.isinf(G).any()}, zeros: {torch.eq(G, 0).any()}")
                     raise ValueError("Inf gradients detected during MCMC.")
                 
                 G += predicted_tokens_grad ** 2
-                G = torch.clamp(G, min=1e-8, max=1e8)
+                G = torch.clamp(G, min=0, max=1e8)
 
-                predicted_tokens = predicted_tokens - alpha * predicted_tokens_grad / (torch.sqrt(G + eps)) + eps # do this to tokens will be unnormalize prob dist convert to prob dist after  
+                predicted_tokens = predicted_tokens - alpha * predicted_tokens_grad / (torch.sqrt(G + eps)) # do this to tokens will be unnormalize prob dist convert to prob dist after  
                 
                 if self.hparams.absolute_clamp != 0.0:
                     predicted_tokens = torch.clamp(predicted_tokens, min = -self.hparams.absolute_clamp, max = self.hparams.absolute_clamp)
