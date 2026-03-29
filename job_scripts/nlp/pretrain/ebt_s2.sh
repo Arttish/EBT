@@ -20,6 +20,7 @@ alpha_random_scale=(2)
 randomize_mcmc_num_steps=(2)
 
 python train_model.py \
+--resume_training_ckpt /content/drive/MyDrive/last.ckpt \
 --run_name ${RUN_NAME}${lr[${SLURM_ARRAY_TASK_ID}]} \
 --modality "NLP" \
 --model_name ${MODEL_NAME} \

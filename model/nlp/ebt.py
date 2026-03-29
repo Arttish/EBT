@@ -159,6 +159,8 @@ class EBT_NLP(L.LightningModule):
                     predicted_tokens_grad = torch.clamp(predicted_tokens_grad, min = -min_and_max, max = min_and_max)
                     
                 if torch.isnan(predicted_tokens_grad).any():
+                    print(f"grad: min {predicted_tokens_grad.min()}, max {predicted_tokens_grad.max()}")
+                    print(f"G: min {G.min()}, max {G.max()}, inf: {torch.isinf(G).any()}, zeros: {torch.eq(G, 0).any()}")
                     raise ValueError("NaN gradients detected during MCMC.")
                 
                 if torch.isinf(predicted_tokens_grad).any():
