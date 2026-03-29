@@ -90,9 +90,7 @@ class EBT_NLP(L.LightningModule):
 
         predicted_tokens = self.corrupt_embeddings(real_embeddings_input) # B, S, V
         if replay_buffer_logits is not None: # using replay buffer, use the logits instead of corruption
-            predicted_tokens[batch_size - replay_buffer_logits.shape[0]:] = replay_buffer_logits # NOTE this assumes the fresh data is concatted first
-
-        v = 0        
+            predicted_tokens[batch_size - replay_buffer_logits.shape[0]:] = replay_buffer_logits # NOTE this assumes the fresh data is concatted first        
         
         mcmc_steps = [] # in the general case of no randomize_mcmc_num_steps then this has len == self.hparams.randomize_mcmc_num_steps
         for step in range(self.hparams.mcmc_num_steps):
@@ -162,11 +160,19 @@ class EBT_NLP(L.LightningModule):
                     # predicted_tokens_grad = scale_clamp(predicted_tokens_grad, -min_and_max, min_and_max)
                     predicted_tokens_grad = torch.clamp(predicted_tokens_grad, min = -min_and_max, max = min_and_max)
                     
-                if torch.isnan(predicted_tokens_grad).any() or torch.isinf(predicted_tokens_grad).any():
-                    raise ValueError("NaN or Inf gradients detected during MCMC.")
+                if torch.isinf(predicted_tokens_grad).any():
+                    print()
+                    raise ValueError("Inf gradients detected during MCMC.")
+                
+                if torch.isnan(predicted_tokens_grad).any():
+                    raise ValueError("NaN gradients detected during MCMC.")
                 
                 v = beta1 * v + (1 - beta1) * predicted_tokens_grad
                 G = beta2 * G + (1 - beta2) * (predicted_tokens_grad ** 2)
+
+                v = v / (1 - beta1 ** (i + 1))
+                G = G / (1 - beta2 ** (i + 1))
+
                 predicted_tokens = predicted_tokens - alpha * v / (torch.sqrt(G) + eps) # do this to tokens will be unnormalize prob dist convert to prob dist after  
                 
                 if self.hparams.absolute_clamp != 0.0:
