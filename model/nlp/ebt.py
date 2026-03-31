@@ -71,8 +71,8 @@ class EBT_NLP(L.LightningModule):
         batch_size = x.shape[0]
         seq_length = x.shape[1]
 
-        v = 0 # momentum term for adam style optimization
-        G = 0 # rmsprop term for adam style optimization
+        v = 0 
+        G = 0 
         eps = 1e-8
         beta1 = self.hparams.infer_beta1
         beta2 = self.hparams.infer_beta2
@@ -165,6 +165,8 @@ class EBT_NLP(L.LightningModule):
                     raise ValueError("Inf gradients detected during MCMC.")
                 
                 if torch.isnan(predicted_tokens_grad).any():
+                    print("v:")
+                    print(f"max:")
                     raise ValueError("NaN gradients detected during MCMC.")
                 
                 v = beta1 * v + (1 - beta1) * predicted_tokens_grad

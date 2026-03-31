@@ -40,8 +40,8 @@ python train_model.py \
 --randomize_mcmc_step_size_scale ${alpha_random_scale[$SLURM_ARRAY_TASK_ID]} \
 --randomize_mcmc_num_steps ${randomize_mcmc_num_steps[${SLURM_ARRAY_TASK_ID}]} \
 --randomize_mcmc_num_steps_min 2 \
---infer_beta1 0.9 \
---infer_beta2 0.999 \
+--infer_beta1 0.85 \
+--infer_beta2 0.99 \
 --mcmc_num_steps 1 \
 \
 --context_length 128 \
