@@ -165,8 +165,6 @@ class EBT_NLP(L.LightningModule):
                     raise ValueError("Inf gradients detected during MCMC.")
                 
                 if torch.isnan(predicted_tokens_grad).any():
-                    print("v:")
-                    print(f"max:")
                     raise ValueError("NaN gradients detected during MCMC.")
                 
                 v = beta1 * v + (1 - beta1) * predicted_tokens_grad
