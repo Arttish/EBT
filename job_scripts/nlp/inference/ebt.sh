@@ -31,11 +31,11 @@ python train_model.py \
 --ebt_type "time_embed" \
 --denoising_initial_condition "random_noise" \
 \
---context_length 256 \
+--context_length 128 \
 \
 --gpus "-1" \
 \
---peak_learning_rate 0.0012 \
+--peak_learning_rate 0.0024 \
 --batch_size_per_device 8 \
 --accumulate_grad_batches 4 \
 --gradient_clip_val 1.0 \
@@ -61,12 +61,13 @@ python train_model.py \
 --infer_langevin_dynamics_noise 1 \
 --infer_ebt_num_steps 2 \
 --only_test \
---only_test_model_ckpt "your/model/ckpt" \
+--only_test_model_ckpt "/content/drive/MyDrive/EBT_models/EBT_no_optim.ckpt" \
 --infer_max_gen_len 2 \
 --infer_topp 0.1 \
 --infer_temp 0.0 \
 --override_slurm_checks \
 \
 --set_matmul_precision "medium" \
+--no_wandb \
 --wandb_watch \
 ${SLURM_ARRAY_TASK_ID:+--is_slurm_run}
