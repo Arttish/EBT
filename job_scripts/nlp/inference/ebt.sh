@@ -31,7 +31,7 @@ python train_model.py \
 --ebt_type "time_embed" \
 --denoising_initial_condition "random_noise" \
 \
---context_length 128 \
+--context_length 256 \
 \
 --gpus "-1" \
 \
