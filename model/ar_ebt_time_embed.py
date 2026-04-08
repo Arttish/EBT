@@ -248,7 +248,10 @@ def reshape_for_broadcast(freqs_cis: torch.Tensor, x: torch.Tensor):
     """
     ndim = x.ndim
     assert 0 <= 1 < ndim
-    assert freqs_cis.shape == (x.shape[1], x.shape[-1])
+    try:
+        assert freqs_cis.shape == (x.shape[1], x.shape[-1])
+    except AssertionError as e:
+        raise AssertionError(f"{e}\n\n freqs_cis.shape={freqs_cis.shape}, x.shape[1]={x.shape[1]}, x.shape[-1]={x.shape[-1]}")
     shape = [d if i == 1 or i == ndim - 1 else 1 for i, d in enumerate(x.shape)]
     return freqs_cis.view(*shape)
 
@@ -427,7 +430,7 @@ class Attention(nn.Module):
         
         xq_o, xk_o = apply_rotary_emb(xq_o, xk_o, freqs_cis=freqs_cis[:original_seqlen])
 
-        xq_p, xk_p = apply_rotary_emb(xq_p, xk_p, freqs_cis=freqs_cis[2:original_seqlen+1]) # use 2 since are the next preds and also have time embeddings and thus need to condition on two tokens
+        xq_p, xk_p = apply_rotary_emb(xq_p, xk_p, freqs_cis=freqs_cis[2:2 + xq_p.shape[1]]) # use 2 since are the next preds and also have time embeddings and thus need to condition on two tokens
         # I tested this compared to prepending row on S dimension and the tensors were the same
 
         # self.cache_k = self.cache_k.to(xq)
