@@ -251,7 +251,8 @@ def reshape_for_broadcast(freqs_cis: torch.Tensor, x: torch.Tensor):
     try:
         assert freqs_cis.shape == (x.shape[1], x.shape[-1])
     except AssertionError as e:
-        raise AssertionError(f"{e}\n\n freqs_cis.shape={freqs_cis.shape}, x.shape[1]={x.shape[1]}, x.shape[-1]={x.shape[-1]}")
+        print(f"freqs_cis.shape={freqs_cis.shape}, x.shape[1]={x.shape[1]}, x.shape[-1]={x.shape[-1]}")
+        raise e
     shape = [d if i == 1 or i == ndim - 1 else 1 for i, d in enumerate(x.shape)]
     return freqs_cis.view(*shape)
 
