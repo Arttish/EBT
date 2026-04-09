@@ -429,10 +429,14 @@ class Attention(nn.Module):
         xv_p = xv[:, original_seqlen:, :, :]
         
         # print(f"freqs_cis shape: {freqs_cis.shape}")
-        xq_o, xk_o = apply_rotary_emb(xq_o, xk_o, freqs_cis=freqs_cis[:original_seqlen])
-        # print(f"xq_o shape: {xq_p.shape}, xk_o shape: {xk_p.shape}, freqs_cis shape: {freqs_cis[:original_seqlen].shape} {freqs_cis[2:2 + xq_p.shape[1]].shape} {freqs_cis[2:original_seqlen+2].shape}")
-        xq_p, xk_p = apply_rotary_emb(xq_p, xk_p, freqs_cis=freqs_cis[2:original_seqlen + 1]) # use 2 since are the next preds and also have time embeddings and thus need to condition on two tokens
-        # I tested this compared to prepending row on S dimension and the tensors were the same
+        try:
+            xq_o, xk_o = apply_rotary_emb(xq_o, xk_o, freqs_cis=freqs_cis[:original_seqlen])
+            # print(f"xq_o shape: {xq_p.shape}, xk_o shape: {xk_p.shape}, freqs_cis shape: {freqs_cis[:original_seqlen].shape} {freqs_cis[2:2 + xq_p.shape[1]].shape} {freqs_cis[2:original_seqlen+2].shape}")
+            xq_p, xk_p = apply_rotary_emb(xq_p, xk_p, freqs_cis=freqs_cis[2:original_seqlen + 1]) # use 2 since are the next preds and also have time embeddings and thus need to condition on two tokens
+            # I tested this compared to prepending row on S dimension and the tensors were the same
+        except AssertionError as e:
+            print(f"\nfreqs_cis shape: {freqs_cis.shape}\n xq_o shape: {xq_o.shape}, xk_o shape: {xk_o.shape}\nxq_p shape: {xq_p.shape}, xk_p shape: {xk_p.shape}\n\n")
+            raise e
 
         # self.cache_k = self.cache_k.to(xq)
         # self.cache_v = self.cache_v.to(xq)
