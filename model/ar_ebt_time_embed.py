@@ -411,7 +411,7 @@ class Attention(nn.Module):
         # """
         # NOTE the usage of S-1/S/S+1 is messed up and confusing here, I recommend checking the paper
         bsz, full_seqlen, _ = x.shape # full_seqlen includes real embeds and pred embeds
-        original_seqlen = (full_seqlen + 1)//2 # this is just the condition plus all original tokens, +1 is bc of condition
+        original_seqlen = (full_seqlen - 1)//2 # this is just the condition plus all original tokens, +1 is bc of condition
         xq, xk, xv = self.wq(x), self.wk(x), self.wv(x)
 
         xq = xq.view(bsz, full_seqlen, self.n_local_heads, self.head_dim)
@@ -431,7 +431,7 @@ class Attention(nn.Module):
         # print(f"freqs_cis shape: {freqs_cis.shape}")
         xq_o, xk_o = apply_rotary_emb(xq_o, xk_o, freqs_cis=freqs_cis[:original_seqlen])
         # print(f"xq_o shape: {xq_p.shape}, xk_o shape: {xk_p.shape}, freqs_cis shape: {freqs_cis[:original_seqlen].shape} {freqs_cis[2:2 + xq_p.shape[1]].shape} {freqs_cis[2:original_seqlen+2].shape}")
-        xq_p, xk_p = apply_rotary_emb(xq_p, xk_p, freqs_cis=freqs_cis[2:original_seqlen + 1] + freqs_cis[:2]) # use 2 since are the next preds and also have time embeddings and thus need to condition on two tokens
+        xq_p, xk_p = apply_rotary_emb(xq_p, xk_p, freqs_cis=freqs_cis[2:original_seqlen + 1]) # use 2 since are the next preds and also have time embeddings and thus need to condition on two tokens
         # I tested this compared to prepending row on S dimension and the tensors were the same
 
         # self.cache_k = self.cache_k.to(xq)
