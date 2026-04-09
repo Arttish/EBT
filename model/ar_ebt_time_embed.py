@@ -429,7 +429,7 @@ class Attention(nn.Module):
         xk_p = xk[:, original_seqlen:, :, :]
         xv_p = xv[:, original_seqlen:, :, :]
 
-        print(f"full_seqlen: {full_seqlen}, original_seqlen: {original_seqlen}, freqs_cis shape: {freqs_cis.shape}, xq_o shape: {xq_o.shape}, xk_o shape: {xk_o.shape}, xq_p shape: {xq_p.shape}, xk_p shape: {xk_p.shape}")
+        print(f"full_seqlen: {full_seqlen}, original_seqlen: orig: {(full_seqlen + 1)//2} mod: {freqs_cis.shape[0] - 1}, freqs_cis shape: {freqs_cis.shape}, xq_o shape: {xq_o.shape}, xk_o shape: {xk_o.shape}, xq_p shape: {xq_p.shape}, xk_p shape: {xk_p.shape}")
         
         # print(f"freqs_cis shape: {freqs_cis.shape}")
         try:
