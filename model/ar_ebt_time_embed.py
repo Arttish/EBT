@@ -411,7 +411,8 @@ class Attention(nn.Module):
         # """
         # NOTE the usage of S-1/S/S+1 is messed up and confusing here, I recommend checking the paper
         bsz, full_seqlen, _ = x.shape # full_seqlen includes real embeds and pred embeds
-        original_seqlen = (full_seqlen + 1)//2 # this is just the condition plus all original tokens, +1 is bc of condition
+        # original_seqlen = (full_seqlen + 1)//2 # this is just the condition plus all original tokens, +1 is bc of condition
+        original_seqlen = freqs_cis.shape[0] - 1
         xq, xk, xv = self.wq(x), self.wk(x), self.wv(x)
 
         xq = xq.view(bsz, full_seqlen, self.n_local_heads, self.head_dim)
