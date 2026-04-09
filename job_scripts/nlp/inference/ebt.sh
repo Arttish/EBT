@@ -57,7 +57,6 @@ python train_model.py \
 --log_gradients \
 \
 --execution_mode "inference" \
---infer_ebt_advanced \
 --infer_langevin_dynamics_noise 1 \
 --infer_ebt_num_steps 2 \
 --only_test \
