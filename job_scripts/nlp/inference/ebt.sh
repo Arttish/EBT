@@ -47,7 +47,7 @@ python train_model.py \
 --warm_up_steps 10000 \
 \
 --dataset_name ${DATASET} \
---num_workers 12 \
+--num_workers 2 \
 --validation_split_pct 0.0005 \
 --val_check_interval 15000 \
 \
