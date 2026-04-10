@@ -89,7 +89,7 @@ class EBT_NLP(L.LightningModule):
         
         mcmc_steps = [] # in the general case of no randomize_mcmc_num_steps then this has len == self.hparams.randomize_mcmc_num_steps
         for step in range(self.hparams.mcmc_num_steps):
-            if not no_randomness and hasattr(self.hparams, 'randomize_mcmc_num_steps') and self.hparams.randomize_mcmc_num_steps > 0:
+            if not no_randomness  and self.hparams.randomize_mcmc_num_steps > 0:
                 if self.hparams.randomize_mcmc_num_steps_final_landscape: # makes so only applies rand steps to final landscape
                     if step == (self.hparams.mcmc_num_steps - 1):
                         min_steps = 1 if self.hparams.randomize_mcmc_num_steps_min == 0 else self.hparams.randomize_mcmc_num_steps_min
@@ -101,7 +101,7 @@ class EBT_NLP(L.LightningModule):
                     min_steps = 1 if self.hparams.randomize_mcmc_num_steps_min == 0 else self.hparams.randomize_mcmc_num_steps_min
                     repeats = torch.randint(min_steps, self.hparams.randomize_mcmc_num_steps + 2, (1,)).item()
                     mcmc_steps.extend([step] * repeats)
-            elif no_randomness and hasattr(self.hparams, 'randomize_mcmc_num_steps') and self.hparams.randomize_mcmc_num_steps > 0: # use max steps
+            elif no_randomness  and self.hparams.randomize_mcmc_num_steps > 0: # use max steps
                 if step == (self.hparams.mcmc_num_steps - 1): # i found this was a better pretraining metric and was more stable, only do several steps on final energy landscape instead of over all energy landscapes
                     mcmc_steps.extend([step] * (self.hparams.randomize_mcmc_num_steps + 1))
                 else:

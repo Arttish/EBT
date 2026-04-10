@@ -19,6 +19,9 @@ BENCHMARKS=("lambada") # "gsm8k" "ai2arc" "bigbench_matrixshapes" "squad" "bigbe
 DATASET=${BENCHMARKS[$SLURM_ARRAY_TASK_ID]}
 export RUN_NAME="${RUN_NAME}_${DATASET}"
 
+alpha_random_scale=(2)
+randomize_mcmc_num_steps=(2)
+
 python train_model.py \
 --run_name ${RUN_NAME} \
 --modality "NLP" \
