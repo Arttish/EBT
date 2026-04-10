@@ -72,5 +72,5 @@ python train_model.py \
 --set_matmul_precision "medium" \
 --no_wandb \
 --wandb_watch \
---compile_model \
+
 ${SLURM_ARRAY_TASK_ID:+--is_slurm_run}
