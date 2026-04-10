@@ -2,6 +2,7 @@
 # coding: utf-8
 import os
 from argparse import ArgumentParser
+from pyexpat import model
 import time
 import pytorch_lightning as L
 from pytorch_lightning.strategies import DDPStrategy
@@ -225,7 +226,18 @@ def main(args):
 
         pretrained_hparams['compile_model'] = False
         model = ModelTrainer(pretrained_hparams)
-        model.load_state_dict(checkpoint['state_dict'])
+
+        state_dict = checkpoint['state_dict']
+        new_state_dict = {}
+        for key, value in state_dict.items():
+            if key.startswith("model._orig_mod."):
+                new_key = key.replace("model._orig_mod.", "model.")
+            else:
+                new_key = key
+            new_state_dict[new_key] = value
+
+        model.load_state_dict(new_state_dict)
+        # model.load_state_dict(checkpoint['state_dict'])
         model.eval()
         model_trainer = ModelTrainer(args, trained_model=model.model) # need to use args as we have to use the model most recently passed in for inference
 
