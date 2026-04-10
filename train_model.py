@@ -129,6 +129,7 @@ def main(args):
     print("devices/args.gpus: ", args.gpus)
 
     args.total_num_workers = args.num_workers * num_gpus
+    args.max_seq_len = args.context_length + args.infer_max_gen_len + 10
     print("num_nodes", args.num_nodes, "total num_workers across all GPUs", args.total_num_workers, "num workers per GPU", args.num_workers, "num_GPUs", num_gpus)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Device: {device}")
