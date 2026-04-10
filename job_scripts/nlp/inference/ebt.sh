@@ -7,7 +7,7 @@
 ### LOG INFO ###
 #SBATCH --job-name=ebt-xxs-2_steps_langevin_1
 #SBATCH --output=logs/slurm/nlp_inference/ebt-xxs-2_steps_langevin_1%A-%a.log
-export RUN_NAME="ebt-xxs-2_steps_langevin_1"
+export RUN_NAME="ebt-4xs-2_steps_langevin_1"
 # NOTE ctrl d ALL THREE of above to modify job-name, output, and RUN_NAME (which should all be the same)
 export MODEL_NAME="${RUN_NAME%%-*}"
 export MODEL_SIZE="${RUN_NAME#*-}"; export MODEL_SIZE="${MODEL_SIZE%%-*}"
@@ -34,7 +34,7 @@ python train_model.py \
 --ebt_type "time_embed" \
 --denoising_initial_condition "random_noise" \
 \
---context_length 512 \
+--context_length 256 \
 \
 --gpus "-1" \
 \
