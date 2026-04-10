@@ -223,6 +223,7 @@ def main(args):
         if args.modality == "VID":
             pretrained_hparams["modality"] = "VID" # this is just to test old models with a refactor of CV -> VID
 
+        pretrained_hparams['compile_model'] = False
         model = ModelTrainer(pretrained_hparams)
         model.load_state_dict(checkpoint['state_dict'])
         model.eval()
