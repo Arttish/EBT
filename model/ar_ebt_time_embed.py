@@ -417,8 +417,8 @@ class Attention(nn.Module):
             extra_needed = original_seqlen + 1 - freqs_cis.shape[0]
             extra_freqs = precompute_freqs_cis(
                 dim=freqs_cis.dim(),
-                end=extra_needed
-            )
+                end=extra_needed * freqs_cis.shape[1]
+            ).reshape((extra_needed, -1))
             print(f"extra_freqs shape{extra_freqs.shape}\n")
             freqs_cis = torch.cat([freqs_cis, extra_freqs.to(freqs_cis.device)], dim=0)
 
