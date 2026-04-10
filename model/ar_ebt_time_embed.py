@@ -419,7 +419,7 @@ class Attention(nn.Module):
                 dim=freqs_cis.dim(),
                 end=extra_needed * freqs_cis.shape[1]
             ).reshape((extra_needed, -1))
-            print(f"extra_freqs shape{extra_freqs.shape}\n")
+            # print(f"extra_freqs shape{extra_freqs.shape}\n")
             freqs_cis = torch.cat([freqs_cis, extra_freqs.to(freqs_cis.device)], dim=0)
 
         xq, xk, xv = self.wq(x), self.wk(x), self.wv(x)
