@@ -416,7 +416,7 @@ class Attention(nn.Module):
         if freqs_cis.shape[0] != original_seqlen + 1:
             extra_needed = original_seqlen + 1 - freqs_cis.shape[0]
             extra_freqs = precompute_freqs_cis(
-                dim=self.params.dim // self.params.n_heads,
+                dim=self.args.dim // self.args.n_heads,
                 end=extra_needed
             )
             freqs_cis = torch.cat([freqs_cis, extra_freqs.to(freqs_cis.device)], dim=0)
