@@ -7,14 +7,14 @@
 ### LOG INFO ###
 #SBATCH --job-name=ebt-4xs-bs_256_s2_lr_
 #SBATCH --output=logs/slurm/nlp/ebt-4xs-bs_256_s2_lr_%A-%a.log
-export RUN_NAME="ebt-4xs-bs_256_s2_lr_"
+export RUN_NAME="ebt-small-bs_256_s2_lr_0.0006"
 # NOTE ctrl d ALL THREE of above to modify job-name, output, and RUN_NAME (which should all be the same)
 export MODEL_NAME="${RUN_NAME%%-*}"
 export MODEL_SIZE="${RUN_NAME#*-}"; export MODEL_SIZE="${MODEL_SIZE%%-*}"
 mkdir -p logs/slurm/nlp/
 module purge
 
-lr=(0.0024)
+lr=(0.0006)
 alpha=(5)
 alpha_random_scale=(2)
 randomize_mcmc_num_steps=(2)
