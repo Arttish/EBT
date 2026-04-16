@@ -47,7 +47,6 @@ python train_model.py \
 --gpus "-1" \
 \
 --peak_learning_rate ${lr[${SLURM_ARRAY_TASK_ID}]} \
---float_precision "bf16-mixed" \
 --batch_size_per_device 32 \
 --prefetch_factor 8 \
 --accumulate_grad_batches 4 \
