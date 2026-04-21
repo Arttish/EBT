@@ -55,7 +55,7 @@ python train_model.py \
 --weight_decay 0.01 \
 --min_lr_scale 10 \
 --max_steps 1000000 \
---max_epochs 1 \
+--max_epochs 2 \
 --max_scheduling_steps 1000000 \
 --warm_up_steps 10000 \
 \
@@ -73,4 +73,6 @@ python train_model.py \
 --wandb_watch \
 --no_wandb \
 --compile_model \
+\
+--resume_training_ckpt "/content/drive/MyDrive/EBT_models/EBT_small.ckpt"
 ${SLURM_ARRAY_TASK_ID:+--is_slurm_run}
