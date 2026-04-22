@@ -7,7 +7,7 @@
 ### LOG INFO ###
 #SBATCH --job-name=ebt-xxs-2_steps_langevin_1
 #SBATCH --output=logs/slurm/nlp_inference/ebt-xxs-2_steps_langevin_1%A-%a.log
-export RUN_NAME="ebt-4xs-2_steps_langevin_1"
+export RUN_NAME="ebt-small-2_steps_langevin_1"
 # NOTE ctrl d ALL THREE of above to modify job-name, output, and RUN_NAME (which should all be the same)
 export MODEL_NAME="${RUN_NAME%%-*}"
 export MODEL_SIZE="${RUN_NAME#*-}"; export MODEL_SIZE="${MODEL_SIZE%%-*}"
@@ -63,7 +63,7 @@ python train_model.py \
 --infer_langevin_dynamics_noise 1 \
 --infer_ebt_num_steps 2 \
 --only_test \
---only_test_model_ckpt "/content/drive/MyDrive/EBT_models/EBT_no_optim.ckpt" \
+--only_test_model_ckpt "/content/drive/MyDrive/EBT_models/EBT_small.ckpt" \
 --infer_max_gen_len 2 \
 --infer_topp 0.1 \
 --infer_temp 0.0 \
