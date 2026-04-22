@@ -55,7 +55,7 @@ python train_model.py \
 --weight_decay 0.01 \
 --min_lr_scale 10 \
 --max_steps 1000000 \
---max_epochs 3 \
+--max_epochs 6 \
 --max_scheduling_steps 1000000 \
 --warm_up_steps 10000 \
 \
