@@ -552,7 +552,7 @@ class ModelTrainer(L.LightningModule):
             elif self.hparams.dataset_name == "planbench":
                 raise NotImplementedError(f"no planbench test split")
             elif self.hparams.dataset_name == "ai2arc":
-                self.test_ds = AI2ArcDataset(self.hparams, split = "test")
+                self.test_ds = AI2ArcDataset(self.hparams, split = "test", task="ARC-Easy")
             else:
                 raise NotImplementedError("haven't implemented this dataset yet")
             print(f"{self.hparams.dataset_name} length of test_ds: {len(self.test_ds)}")
