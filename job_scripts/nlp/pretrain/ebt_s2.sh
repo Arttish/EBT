@@ -58,7 +58,7 @@ python train_model.py \
 --max_scheduling_steps 1000000 \
 --warm_up_steps 10000 \
 \
---dataset_name "ai2arc" \
+--dataset_name "lambada" \
 --num_workers 12 \
 --validation_split_pct 0.0005 \
 --val_check_interval 1.0 \
