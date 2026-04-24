@@ -59,7 +59,7 @@ python train_model.py \
 --max_scheduling_steps 1000000 \
 --warm_up_steps 10000 \
 \
---dataset_name "pajama" \
+--dataset_name "ai2arc" \
 --num_workers 12 \
 --validation_split_pct 0.0005 \
 --val_check_interval 1.0 \
@@ -74,5 +74,6 @@ python train_model.py \
 --no_wandb \
 --compile_model \
 \
---resume_training_ckpt "/content/drive/MyDrive/EBT_models/EBT_small.ckpt"
+--execution_mode "finetune" \
+--finetuning_model_ckpt "/content/drive/MyDrive/EBT_models/EBT_small.ckpt" \
 ${SLURM_ARRAY_TASK_ID:+--is_slurm_run}
