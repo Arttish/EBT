@@ -24,6 +24,7 @@ class EBT_NLP(L.LightningModule):
         
         self.tokenizer = AutoTokenizer.from_pretrained(self.hparams.tokenizer, clean_up_tokenization_spaces = False)
         self.tokenizer_pad_token_id = self.tokenizer.eos_token_id # is token 0, was right padding things
+        self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
         
         self.vocab_size = len(self.tokenizer) # self.vocab_size = self.tokenizer.vocab_size caused errors since is smaller than len(self.tokenizer), is 50254 for neox-20b, len tokenizer is 50277 so decided to use that
         
