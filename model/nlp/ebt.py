@@ -22,10 +22,11 @@ class EBT_NLP(L.LightningModule):
         else:
             self.hparams.update(vars(hparams))
         
-        tokenizer = AutoTokenizer.from_pretrained(self.hparams.tokenizer, clean_up_tokenization_spaces = False)
-        self.tokenizer_pad_token_id = tokenizer.eos_token_id # is token 0, was right padding things
+        self.tokenizer = AutoTokenizer.from_pretrained(self.hparams.tokenizer, clean_up_tokenization_spaces = False)
+        self.tokenizer_pad_token_id = self.tokenizer.eos_token_id # is token 0, was right padding things
+        self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
         
-        self.vocab_size = len(tokenizer) # self.vocab_size = self.tokenizer.vocab_size caused errors since is smaller than len(self.tokenizer), is 50254 for neox-20b, len tokenizer is 50277 so decided to use that
+        self.vocab_size = len(self.tokenizer) # self.vocab_size = self.tokenizer.vocab_size caused errors since is smaller than len(self.tokenizer), is 50254 for neox-20b, len tokenizer is 50277 so decided to use that
         
         self.alpha = nn.Parameter(torch.tensor(float(self.hparams.mcmc_step_size)), requires_grad=self.hparams.mcmc_step_size_learnable)
         self.langevin_dynamics_noise_std = nn.Parameter(torch.tensor(float(self.hparams.langevin_dynamics_noise)), requires_grad=False) # if using self.hparams.langevin_dynamics_noise_learnable this will be turned on in warm_up_finished func
@@ -91,7 +92,7 @@ class EBT_NLP(L.LightningModule):
         
         mcmc_steps = [] # in the general case of no randomize_mcmc_num_steps then this has len == self.hparams.randomize_mcmc_num_steps
         for step in range(self.hparams.mcmc_num_steps):
-            if not no_randomness and hasattr(self.hparams, 'randomize_mcmc_num_steps') and self.hparams.randomize_mcmc_num_steps > 0:
+            if not no_randomness  and self.hparams.randomize_mcmc_num_steps > 0:
                 if self.hparams.randomize_mcmc_num_steps_final_landscape: # makes so only applies rand steps to final landscape
                     if step == (self.hparams.mcmc_num_steps - 1):
                         min_steps = 1 if self.hparams.randomize_mcmc_num_steps_min == 0 else self.hparams.randomize_mcmc_num_steps_min
@@ -103,7 +104,7 @@ class EBT_NLP(L.LightningModule):
                     min_steps = 1 if self.hparams.randomize_mcmc_num_steps_min == 0 else self.hparams.randomize_mcmc_num_steps_min
                     repeats = torch.randint(min_steps, self.hparams.randomize_mcmc_num_steps + 2, (1,)).item()
                     mcmc_steps.extend([step] * repeats)
-            elif no_randomness and hasattr(self.hparams, 'randomize_mcmc_num_steps') and self.hparams.randomize_mcmc_num_steps > 0: # use max steps
+            elif no_randomness  and self.hparams.randomize_mcmc_num_steps > 0: # use max steps
                 if step == (self.hparams.mcmc_num_steps - 1): # i found this was a better pretraining metric and was more stable, only do several steps on final energy landscape instead of over all energy landscapes
                     mcmc_steps.extend([step] * (self.hparams.randomize_mcmc_num_steps + 1))
                 else:

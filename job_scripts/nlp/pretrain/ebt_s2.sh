@@ -5,16 +5,16 @@
 #SBATCH --gpus-per-node=4
 
 ### LOG INFO ###
-#SBATCH --job-name=ebt-xxs-bs_256_s2_lr_
-#SBATCH --output=logs/slurm/nlp/ebt-xxs-bs_256_s2_lr_%A-%a.log
-export RUN_NAME="ebt-4xs-bs_256_s2_lr_0.0024"
+#SBATCH --job-name=ebt-4xs-bs_256_s2_lr_
+#SBATCH --output=logs/slurm/nlp/ebt-4xs-bs_256_s2_lr_%A-%a.log
+export RUN_NAME="ebt-small-bs_256_s2_lr_0.0006"
 # NOTE ctrl d ALL THREE of above to modify job-name, output, and RUN_NAME (which should all be the same)
 export MODEL_NAME="${RUN_NAME%%-*}"
 export MODEL_SIZE="${RUN_NAME#*-}"; export MODEL_SIZE="${MODEL_SIZE%%-*}"
 mkdir -p logs/slurm/nlp/
 module purge
 
-lr=(0.0024)
+lr=(0.0006)
 alpha=(5)
 alpha_random_scale=(2)
 randomize_mcmc_num_steps=(2)
@@ -25,7 +25,6 @@ python train_model.py \
 --model_name ${MODEL_NAME} \
 --model_size ${MODEL_SIZE} \
 \
---pretokenize_dataset \
 --tokenizer "EleutherAI/gpt-neox-20b" \
 \
 --no_mcmc_detach \
@@ -48,8 +47,7 @@ python train_model.py \
 --gpus "-1" \
 \
 --peak_learning_rate ${lr[${SLURM_ARRAY_TASK_ID}]} \
---float_precision "bf16-mixed" \
---batch_size_per_device 80 \
+--batch_size_per_device 32 \
 --prefetch_factor 8 \
 --accumulate_grad_batches 4 \
 --gradient_clip_val 1.0 \
@@ -57,11 +55,11 @@ python train_model.py \
 --weight_decay 0.01 \
 --min_lr_scale 10 \
 --max_steps 1000000 \
---max_epochs 3 \
+--max_epochs 6 \
 --max_scheduling_steps 1000000 \
 --warm_up_steps 10000 \
 \
---dataset_name "pajama" \
+--dataset_name "lambada" \
 --num_workers 12 \
 --validation_split_pct 0.0005 \
 --val_check_interval 1.0 \
@@ -76,4 +74,7 @@ python train_model.py \
 --wandb_watch \
 --no_wandb \
 --compile_model \
+\
+--execution_mode "finetune" \
+--finetuning_model_ckpt "/content/drive/MyDrive/EBT_models/EBT_small.ckpt" \
 ${SLURM_ARRAY_TASK_ID:+--is_slurm_run}

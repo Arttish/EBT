@@ -248,7 +248,11 @@ def reshape_for_broadcast(freqs_cis: torch.Tensor, x: torch.Tensor):
     """
     ndim = x.ndim
     assert 0 <= 1 < ndim
-    assert freqs_cis.shape == (x.shape[1], x.shape[-1])
+    try:
+        assert freqs_cis.shape == (x.shape[1], x.shape[-1])
+    except AssertionError as e:
+        print(f"freqs_cis.shape={freqs_cis.shape}, x.shape[1]={x.shape[1]}, x.shape[-1]={x.shape[-1]}")
+        raise e
     shape = [d if i == 1 or i == ndim - 1 else 1 for i, d in enumerate(x.shape)]
     return freqs_cis.view(*shape)
 
@@ -408,6 +412,16 @@ class Attention(nn.Module):
         # NOTE the usage of S-1/S/S+1 is messed up and confusing here, I recommend checking the paper
         bsz, full_seqlen, _ = x.shape # full_seqlen includes real embeds and pred embeds
         original_seqlen = (full_seqlen + 1)//2 # this is just the condition plus all original tokens, +1 is bc of condition
+        # original_seqlen = freqs_cis.shape[0] - 1
+        if freqs_cis.shape[0] != original_seqlen + 1:
+            extra_needed = original_seqlen + 1 - freqs_cis.shape[0]
+            extra_freqs = precompute_freqs_cis(
+                dim=freqs_cis.dim(),
+                end=extra_needed * freqs_cis.shape[1]
+            ).reshape((extra_needed, -1))
+            # print(f"extra_freqs shape{extra_freqs.shape}\n")
+            freqs_cis = torch.cat([freqs_cis, extra_freqs.to(freqs_cis.device)], dim=0)
+
         xq, xk, xv = self.wq(x), self.wk(x), self.wv(x)
 
         xq = xq.view(bsz, full_seqlen, self.n_local_heads, self.head_dim)
@@ -423,12 +437,18 @@ class Attention(nn.Module):
         xq_p = xq[:, original_seqlen:, :, :] #B, S-1, N, H (N and H are num head and head dim respectively)
         xk_p = xk[:, original_seqlen:, :, :]
         xv_p = xv[:, original_seqlen:, :, :]
-        
-        
-        xq_o, xk_o = apply_rotary_emb(xq_o, xk_o, freqs_cis=freqs_cis[:original_seqlen])
 
-        xq_p, xk_p = apply_rotary_emb(xq_p, xk_p, freqs_cis=freqs_cis[2:original_seqlen+1]) # use 2 since are the next preds and also have time embeddings and thus need to condition on two tokens
-        # I tested this compared to prepending row on S dimension and the tensors were the same
+        # print(f"full_seqlen: {full_seqlen}, original_seqlen: orig: {(full_seqlen + 1)//2} mod: {freqs_cis.shape[0] - 1}, freqs_cis shape: {freqs_cis.shape}, xq_o shape: {xq_o.shape}, xk_o shape: {xk_o.shape}, xq_p shape: {xq_p.shape}, xk_p shape: {xk_p.shape}")
+        
+        # print(f"freqs_cis shape: {freqs_cis.shape}")
+        try:
+            xq_o, xk_o = apply_rotary_emb(xq_o, xk_o, freqs_cis=freqs_cis[:original_seqlen])
+            # print(f"xq_o shape: {xq_p.shape}, xk_o shape: {xk_p.shape}, freqs_cis shape: {freqs_cis[:original_seqlen].shape} {freqs_cis[2:2 + xq_p.shape[1]].shape} {freqs_cis[2:original_seqlen+2].shape}")
+            xq_p, xk_p = apply_rotary_emb(xq_p, xk_p, freqs_cis=freqs_cis[2:original_seqlen + 1]) # use 2 since are the next preds and also have time embeddings and thus need to condition on two tokens
+            # I tested this compared to prepending row on S dimension and the tensors were the same
+        except AssertionError as e:
+            print(f"\noriginal_seqlen: {original_seqlen}\nfreqs_cis shape: {freqs_cis.shape}\n xq_o shape: {xq_o.shape}, xk_o shape: {xk_o.shape}\nxq_p shape: {xq_p.shape}, xk_p shape: {xk_p.shape}\n\n")
+            raise e
 
         # self.cache_k = self.cache_k.to(xq)
         # self.cache_v = self.cache_v.to(xq)
