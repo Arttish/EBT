@@ -23,8 +23,6 @@ class EBT_NLP(L.LightningModule):
             self.hparams.update(vars(hparams))
         
         self.tokenizer = AutoTokenizer.from_pretrained(self.hparams.tokenizer, clean_up_tokenization_spaces = False)
-        special_tokens = {"additional_special_tokens": ["[[Question]]", "[[Answer]]"]}
-        self.tokenizer.add_special_tokens(special_tokens)
         self.tokenizer_pad_token_id = self.tokenizer.eos_token_id # is token 0, was right padding things
         self.tokenizer.pad_token_id = self.tokenizer.eos_token_id
         
