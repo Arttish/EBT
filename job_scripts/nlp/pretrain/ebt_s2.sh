@@ -25,7 +25,6 @@ python train_model.py \
 --model_name ${MODEL_NAME} \
 --model_size ${MODEL_SIZE} \
 \
---pretokenize_dataset \
 --tokenizer "EleutherAI/gpt-neox-20b" \
 \
 --no_mcmc_detach \
