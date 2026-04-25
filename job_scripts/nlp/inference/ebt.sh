@@ -61,7 +61,7 @@ python train_model.py \
 \
 --execution_mode "inference" \
 --infer_langevin_dynamics_noise 1 \
---infer_ebt_num_steps 2 \
+--infer_ebt_num_steps 5 \
 --only_test \
 --only_test_model_ckpt "/content/drive/MyDrive/EBT_models/EBT_small.ckpt" \
 --infer_max_gen_len 2 \
