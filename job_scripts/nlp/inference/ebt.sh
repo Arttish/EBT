@@ -7,7 +7,7 @@
 ### LOG INFO ###
 #SBATCH --job-name=ebt-xxs-2_steps_langevin_1
 #SBATCH --output=logs/slurm/nlp_inference/ebt-xxs-2_steps_langevin_1%A-%a.log
-export RUN_NAME="ebt-xxs-2_steps_langevin_1"
+export RUN_NAME="ebt-small-2_steps_langevin_1"
 # NOTE ctrl d ALL THREE of above to modify job-name, output, and RUN_NAME (which should all be the same)
 export MODEL_NAME="${RUN_NAME%%-*}"
 export MODEL_SIZE="${RUN_NAME#*-}"; export MODEL_SIZE="${MODEL_SIZE%%-*}"
@@ -18,6 +18,9 @@ module purge
 BENCHMARKS=("lambada") # "gsm8k" "ai2arc" "bigbench_matrixshapes" "squad" "bigbench_elementary_math_qa" "bigbench_dyck_languages" 
 DATASET=${BENCHMARKS[$SLURM_ARRAY_TASK_ID]}
 export RUN_NAME="${RUN_NAME}_${DATASET}"
+
+alpha_random_scale=(2)
+randomize_mcmc_num_steps=(2)
 
 python train_model.py \
 --run_name ${RUN_NAME} \
@@ -35,7 +38,7 @@ python train_model.py \
 \
 --gpus "-1" \
 \
---peak_learning_rate 0.0012 \
+--peak_learning_rate 0.0024 \
 --batch_size_per_device 8 \
 --accumulate_grad_batches 4 \
 --gradient_clip_val 1.0 \
@@ -47,7 +50,7 @@ python train_model.py \
 --warm_up_steps 10000 \
 \
 --dataset_name ${DATASET} \
---num_workers 12 \
+--num_workers 2 \
 --validation_split_pct 0.0005 \
 --val_check_interval 15000 \
 \
@@ -57,16 +60,17 @@ python train_model.py \
 --log_gradients \
 \
 --execution_mode "inference" \
---infer_ebt_advanced \
 --infer_langevin_dynamics_noise 1 \
 --infer_ebt_num_steps 2 \
 --only_test \
---only_test_model_ckpt "your/model/ckpt" \
+--only_test_model_ckpt "/content/drive/MyDrive/EBT_models/EBT_small.ckpt" \
 --infer_max_gen_len 2 \
 --infer_topp 0.1 \
 --infer_temp 0.0 \
 --override_slurm_checks \
 \
 --set_matmul_precision "medium" \
+--no_wandb \
 --wandb_watch \
+
 ${SLURM_ARRAY_TASK_ID:+--is_slurm_run}
