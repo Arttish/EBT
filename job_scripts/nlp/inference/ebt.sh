@@ -39,7 +39,7 @@ python train_model.py \
 --gpus "-1" \
 \
 --peak_learning_rate 0.0024 \
---batch_size_per_device 64 \
+--batch_size_per_device 32 \
 --accumulate_grad_batches 4 \
 --gradient_clip_val 1.0 \
 \
