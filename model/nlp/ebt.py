@@ -171,10 +171,10 @@ class EBT_NLP(L.LightningModule):
                 v = beta1 * v + (1 - beta1) * predicted_tokens_grad
                 G = beta2 * G + (1 - beta2) * (predicted_tokens_grad ** 2)
 
-                v = v / (1 - beta1 ** (i + 1))
-                G = G / (1 - beta2 ** (i + 1))
+                v1 = v / (1 - beta1 ** (i + 1))
+                G1 = G / (1 - beta2 ** (i + 1))
 
-                predicted_tokens = predicted_tokens - alpha * v / (torch.sqrt(G) + eps) # do this to tokens will be unnormalize prob dist convert to prob dist after  
+                predicted_tokens = predicted_tokens - alpha * v1 / (torch.sqrt(G1) + eps) # do this to tokens will be unnormalize prob dist convert to prob dist after  
                 
                 if self.hparams.absolute_clamp != 0.0:
                     predicted_tokens = torch.clamp(predicted_tokens, min = -self.hparams.absolute_clamp, max = self.hparams.absolute_clamp)
@@ -501,11 +501,11 @@ class EBT_NLP(L.LightningModule):
 
                 v = beta1 * v + (1 - beta1) * grad
                 G = beta2 * G + (1 - beta2) * (grad ** 2)
-                v = v / (1 - beta1 ** (step_idx + 1))
-                G = G / (1 - beta2 ** (step_idx + 1))   
+                v1 = v / (1 - beta1 ** (step_idx + 1))
+                G1 = G / (1 - beta2 ** (step_idx + 1))   
                 if self.hparams.infer_accept_lower_energies: # have to get energy to determine if should decrease
                     old_energies = energies.reshape(cur_pred_tokens.shape[:2])
-                    proposed_tokens = cur_pred_tokens - alpha * v / (torch.sqrt(G) + eps)
+                    proposed_tokens = cur_pred_tokens - alpha * v1 / (torch.sqrt(G1) + eps)
                     new_energies = get_energy(step_idx, proposed_tokens).reshape(cur_pred_tokens.shape[:2])
                     accept_mask = (new_energies < old_energies).float().unsqueeze(-1)
                     updated_tokens = accept_mask * proposed_tokens + (1 - accept_mask) * cur_pred_tokens
