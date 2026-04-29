@@ -480,7 +480,7 @@ class EBT_NLP(L.LightningModule):
                 energies_list.append(energies.detach())
 
                 grad = torch.autograd.grad(energies.sum(), [cur_pred_tokens], create_graph=learning)[0]
-                v = beta * v + grad
+                v = beta * v + (1 - beta) * grad
 
                 if self.hparams.clamp_futures_grad:
                     min_and_max = self.hparams.clamp_futures_grad_max_change / (alpha)
