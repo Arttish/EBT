@@ -525,7 +525,7 @@ class EBT_NLP(L.LightningModule):
             total_steps = self.hparams.infer_ebt_num_steps if self.hparams.infer_ebt_num_steps > 1 else self.hparams.mcmc_num_steps
             pred_state = initial_pred_tokens
             for step_idx in range(total_steps):
-                pred_state, v = do_mcmc_step(step_idx, pred_state, adjusted_alpha, self.hparams.infer_beta, v)
+                pred_state, v = do_mcmc_step(step_idx, pred_state, adjusted_alpha, self.hparams.beta, v)
                 pred_states_list.append(pred_state)
         else:
             # alternative ebt_type i.e. adaln or time embed
@@ -533,13 +533,13 @@ class EBT_NLP(L.LightningModule):
             for step_idx in range(self.hparams.mcmc_num_steps):
                 if self.hparams.infer_steps_final_landscape and step_idx != (self.hparams.mcmc_num_steps - 1):
                     alpha = self.alpha if self.hparams.infer_alpha_final_landscape else adjusted_alpha
-                    pred_state, v = do_mcmc_step(step_idx, pred_state, alpha, self.hparams.infer_beta, v)
+                    pred_state, v = do_mcmc_step(step_idx, pred_state, alpha, self.hparams.beta, v)
                     pred_states_list.append(pred_state)
                 else:
                     inner_steps = self.hparams.infer_ebt_num_steps if self.hparams.infer_ebt_num_steps != 1 else (self.hparams.randomize_mcmc_num_steps_min if self.hparams.randomize_mcmc_num_steps_min != 0 else 1)
                     for _ in range(inner_steps):
                         alpha = self.alpha if (self.hparams.infer_alpha_final_landscape and step_idx != (self.hparams.mcmc_num_steps - 1)) else adjusted_alpha
-                        pred_state, v = do_mcmc_step(step_idx, pred_state, alpha, self.hparams.infer_beta, v)
+                        pred_state, v = do_mcmc_step(step_idx, pred_state, alpha, self.hparams.beta, v)
                         pred_states_list.append(pred_state)
 
 
