@@ -72,5 +72,6 @@ python train_model.py \
 --set_matmul_precision "medium" \
 --no_wandb \
 --wandb_watch \
+--infer_ebt_advanced \
 
 ${SLURM_ARRAY_TASK_ID:+--is_slurm_run}
